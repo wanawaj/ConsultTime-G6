@@ -3,18 +3,25 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:frontend": "vite --host 0.0.0.0",
     "dev:backend": "node backend/server.mjs",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "node backend/server.mjs",
+    "dev:neon": "node --env-file=.env scripts/dev.mjs",
+    "db:migrate": "node --env-file=.env backend/scripts/migrate.mjs",
+    "db:create-staff": "node --env-file=.env backend/scripts/create-staff.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.0"
+    "react-router-dom": "^7.9.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.0",
