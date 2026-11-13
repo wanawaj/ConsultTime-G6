@@ -325,13 +325,11 @@
   flex-wrap: wrap;
   margin-top: auto;
 }
-/* Labels are decorative, non-interactive, and react when any part of the CARD is hovered. */
+/* Role chips imitate the SOMS button hover-fill animation and also filter the catalog. */
 .ct-catalog-role-chip {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  pointer-events: none;
-  user-select: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -347,6 +345,8 @@
     color 0.28s ease,
     border-color 0.28s ease,
     box-shadow 0.28s ease;
+  pointer-events: none;
+  cursor: default;
 }
 .ct-catalog-role-chip::before {
   content: "";
@@ -357,12 +357,14 @@
   transform: translateX(-102%);
   transition: transform 0.31s cubic-bezier(0.2, 0.65, 0.25, 1);
 }
-.ct-catalog-card:hover .ct-catalog-role-chip {
+.ct-catalog-card:hover .ct-catalog-role-chip,
+.ct-catalog-card:focus-within .ct-catalog-role-chip {
   color: #fff;
   border-color: #c70b0b;
   box-shadow: 0 5px 13px rgba(172, 19, 19, 0.16);
 }
-.ct-catalog-card:hover .ct-catalog-role-chip::before {
+.ct-catalog-card:hover .ct-catalog-role-chip::before,
+.ct-catalog-card:focus-within .ct-catalog-role-chip::before {
   transform: translateX(0);
 }
 .ct-catalog-role-chip span {
