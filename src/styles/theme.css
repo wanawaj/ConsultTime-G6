@@ -1,25 +1,15 @@
 :root {
+  /* Approved ConsultTime brand gradient: red -> coral. Never use dark maroon as a stop. */
   --ct-red: #dc0e0e;
-  --ct-red-deep: #940909;
-  --ct-red-dark: #500707;
-  --ct-gradient: linear-gradient(
-    125deg,
-    #f02121 0%,
-    #dc0e0e 37%,
-    #a00a0a 74%,
-    #690606 100%
-  );
-  --ct-gradient-dark: linear-gradient(
-    120deg,
-    #b90909 0%,
-    #8d0909 55%,
-    #490707 100%
-  );
+  --ct-coral: #fe6244;
+  --ct-red-deep: #dc0e0e;
+  --ct-red-dark: #dc0e0e;
+  --ct-gradient: linear-gradient(120deg, #dc0e0e 0%, #fe6244 100%);
+  --ct-gradient-dark: linear-gradient(125deg, #dc0e0e 0%, #fe6244 100%);
   --ct-text: #222126;
   --ct-muted: #6c6970;
   --ct-line: #efe5e5;
   --ct-rose: #fff5f5;
-  /* Match the latest SOMS layout: up to 1600px of content with 18–42px side gutters. */
   --ct-width: 1600px;
   --ct-gutter: clamp(18px, 3vw, 42px);
 }
