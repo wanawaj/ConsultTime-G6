@@ -6,7 +6,7 @@ import WorkflowSteps from "../components/WorkflowSteps.jsx";
 import LandingHero from "../components/LandingHero.jsx";
 import "../styles/features.css";
 
-// The descriptions and availability flags reflect the bundled local prototype.
+// The descriptions and availability flags reflect the features currently implemented in this build.
 // "planned" items are concepts for future development, NOT working product features.
 const roles = [
   { id: "all", label: "All features", icon: "layers" },
@@ -559,10 +559,10 @@ export default function FeaturesPage() {
           <Icon name="check-circle" size={19} />
           <p>
             <strong>What do the labels mean?</strong> <b>In the demo</b>{" "}
-            identifies functionality currently provided in this local
-            ConsultTime prototype. <b>Planned</b> identifies ideas inspired by
-            your references that still need to be developed, tested, and
-            connected to the backend.
+            identifies functionality currently provided in this ConsultTime
+            build. <b>Planned</b> identifies ideas inspired by your references
+            that still need to be developed, tested, and connected to the
+            backend.
           </p>
         </div>
       </section>
