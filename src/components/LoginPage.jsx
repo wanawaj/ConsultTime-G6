@@ -69,7 +69,7 @@ export default function LoginPage() {
         New to ConsultTime? <Link to="/signup">Create an account</Link>
       </p>
       <p className="ct-auth-demo-note">
-        Local demonstration accounts are listed in the README file.
+        Use a ConsultTime account created or provided for this system.
       </p>
     </AuthFrame>
   );
