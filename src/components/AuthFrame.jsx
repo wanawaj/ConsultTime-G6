@@ -8,9 +8,10 @@ export default function AuthFrame({
   children,
   wide = false,
   sideLabel = "STAY CONNECTED",
+  pageClassName = "",
 }) {
   return (
-    <div className="ct-auth-page">
+    <div className={`ct-auth-page ${pageClassName}`.trim()}>
       <div className={`ct-auth-card${wide ? " wide" : ""}`}>
         <div className="ct-auth-decoration">
           <div className="ct-auth-decoration-top">
