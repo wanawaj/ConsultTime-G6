@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal.jsx";
 import Icon from "../components/Icon.jsx";
 import WorkflowSteps from "../components/WorkflowSteps.jsx";
-import PortalPreview from "../components/PortalPreview.jsx";
+import LandingHero from "../components/LandingHero.jsx";
 import "../styles/features.css";
 
 // The descriptions and availability flags reflect the bundled local prototype.
@@ -363,30 +363,42 @@ export default function FeaturesPage() {
 
   return (
     <div className="ct-inner-page ct-features-page">
-      <section
-        className="ct-inner-hero ct-features-intro"
-        aria-labelledby="ct-features-title"
-      >
-        <div className="ct-container ct-inner-hero-grid">
-          <div>
-            <span className="ct-eyebrow">EXPLORE CONSULTTIME</span>
-            <h1 id="ct-features-title">
-              One platform. Every consultation made simpler.
-            </h1>
-            <p>
-              From requesting a meeting to coordinating appointments and
-              reviewing campus activity, discover how ConsultTime brings the
-              consultation journey together.
-            </p>
-            <a href="#feature-catalog" className="ct-btn ct-btn-primary">
-              Explore Features <Icon name="arrow-right" size={16} />
-            </a>
-          </div>
-          <div className="ct-feature-visual">
-            <PortalPreview />
-          </div>
-        </div>
-      </section>
+      <LandingHero
+        id="ct-features-title"
+        variant="features"
+        eyebrow="EXPLORE CONSULTTIME"
+        title="One platform."
+        accent="Every consultation made simpler."
+        description="From requesting a meeting to coordinating appointments and reviewing campus activity, discover how ConsultTime brings the consultation journey together."
+        primary={{ label: "Explore Features", to: "/features#feature-catalog" }}
+        secondary={{ label: "Create Account", to: "/signup" }}
+        badges={[
+          {
+            icon: "search",
+            title: "Find your tools",
+            text: "Browse by role and feature",
+            spot: "top-left",
+          },
+          {
+            icon: "check-circle",
+            title: "Request tracking",
+            text: "Know where each request stands",
+            spot: "top-right",
+          },
+          {
+            icon: "layers",
+            title: "Organized views",
+            text: "Tools grouped by purpose",
+            spot: "bottom-left",
+          },
+          {
+            icon: "shield",
+            title: "Role clarity",
+            text: "Students, faculty and admin",
+            spot: "bottom-right",
+          },
+        ]}
+      />
 
       <section
         className="ct-container ct-section ct-feature-catalog-section"
