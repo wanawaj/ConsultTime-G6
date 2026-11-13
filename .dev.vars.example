@@ -1,0 +1,3 @@
+# For local Cloudflare Pages Functions development (Wrangler); copy to .dev.vars.
+API_ORIGIN=https://YOUR-RENDER-SERVICE.onrender.com
+API_PROXY_SECRET=REPLACE_WITH_THE_SAME_RANDOM_SECRET_AS_RENDER
