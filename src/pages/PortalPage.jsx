@@ -393,9 +393,9 @@ export default function PortalPage() {
           )}
         </section>
         <p className="ct-portal-devnote">
-          Local development prototype • Data is saved to the backend/data folder
-          on your computer. Not intended for real student records until
-          production security and university requirements are implemented.
+          ConsultTime workspace • Requests are saved by the configured backend.
+          University identity verification is required before accepting real
+          student records.
         </p>
         <Link to="/" className="ct-portal-back">
           ← Back to ConsultTime homepage
