@@ -1,152 +1,37 @@
-# ConsultTime — Fresh Standalone Project
+# ConsultTime — WMSU Consultation Platform
 
-A **NEW, separate ConsultTime source-code project**, inspired by the uploaded SOMS reference's page organization, responsive header, roomy page sizing, footer layout, scroll animations, and progressive sign-up flow. Its visual identity uses the ConsultTime red `#DC0E0E` and gradients, NOT the SOMS branding.
+React/Vite frontend with student/faculty/admin portals, a Node.js API, and optional Neon PostgreSQL persistence. The existing landing design, brand colors (`#DC0E0E` to `#FE6244`), WMSU college/program selectors, and live password caption are preserved.
 
-The project is **self-contained**. It does not require any existing ConsultTime source files and does not touch the earlier GitHub repository.
+## Development
 
-## Requirements
-
-- **Node.js 20+** and npm.
-- Windows, macOS, or Linux.
-
-## Get started
-
-1. Extract `ConsultTime_Features_Organized_By_Role.zip`.
-2. In VS Code, use **File > Open Folder** and choose `ConsultTime_Features_Organized_By_Role`.
-3. Open a terminal in that folder.
-4. Install dependencies, then run development servers:
+Requires Node.js 20.19+ (Node 22 recommended). In the project root:
 
 ```bash
 npm install
 npm run dev
 ```
 
-5. Open **http://localhost:5173**.
+This keeps the previous **local JSON demo** backend on port `3001`, Vite on port `5173`, and uses the same API proxy as before. No cloud credentials are needed for local demo work. To compile the React client run `npm run build`.
 
-`npm run dev` starts both the Vite frontend on port **5173** and a Node API on port **3001**. Vite proxies `/api` requests to the local backend. The server automatically creates a local JSON database at `backend/data/dev-db.json` when first launched.
+Existing demo logins are **for local development only**: `faculty@consulttime.local`, `faculty2@consulttime.local`, `admin@consulttime.local` with password `DemoPass123!`. These accounts are not seeded into production PostgreSQL.
 
-If port 3001 is already in use, stop that process before starting the app. If the frontend cannot reach the API, check both processes' terminal output.
+## Cloud deployment
 
-## SOMS-matched page spacing (updated)
+See **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** for the complete Cloudflare Pages + Render + Neon workflow, including database initialization, staff accounts, first-party session proxy, GitHub branch settings and domain registration.
 
-This revision fixes the wide blank margins visible on desktop monitors. The **shared public and dashboard container** now uses the same responsive measurement as the latest SOMS reference:
+Quick architecture:
 
-- Maximum inner content width: `1600px` (previously `1200px`)
-- Left/right viewport gutters: `clamp(18px, 3vw, 42px)` (previously `clamp(22px, 4vw, 40px)`)
-- Header, hero, sections, feature cards, footer, and dashboard content all use `.ct-container` and align on the same content edges.
-- The wider **sign-up form card remains unchanged** from the previous ZIP.
-- ConsultTime's red gradient and all functional backend code are unchanged.
+- Cloudflare Pages hosts Vite's `dist/` and runs `functions/api/[[path]].js` to proxy `/api/*`.
+- Render runs `npm start` / `backend/server.mjs` with `NODE_ENV=production`, `DATABASE_URL` and `API_PROXY_SECRET`.
+- Neon stores users, session hashes and consultation bookings in PostgreSQL.
+- Without `DATABASE_URL` in development, the original local JSON backend runs instead.
 
-At a `1536px` browser viewport, the content begins roughly `42px` from each side rather than `168px`. At `1920px`, the shared content width is capped at `1600px`.
+**Never commit `.env`, `.dev.vars`, database URLs or secrets.** The cloud ZIP contains example variables only. Existing test data in `backend/data/` is intentionally excluded from the ZIP and is not imported into Neon.
 
-If you have already installed the previous ZIP, you can also copy only `src/styles/theme.css` and `src/styles/site.css` from this revision into your project, then refresh the page. No reinstall or database reset is required for this purely visual update.
+## Current application routes
 
-## Page flow
+`/` (Home), `/about`, `/features`, `/login`, `/signup`, `/portal` (student/faculty/admin), `/forgot-password` (administrator-assisted recovery; email recovery not built).
 
-- `/` — Home, professional two-column hero, animated benefit sections, 3-step consultation workflow.
-- `/about` — About Us page.
-- `/features` — Features page.
-- `/signup` — spacious two-step responsive student account creation page.
-- `/login` — role-aware login.
-- `/portal` — Student, Faculty or Administrator dashboard (depends on account role).
-- `/forgot-password` — informational page; no recovery emails are sent.
+**University identity verification, password recovery, audit logging, privacy governance and additional hardening are required before accepting genuine WMSU student records.** This is an infrastructure integration step, not a certified production launch.
 
-Navigation is linked between pages and works on desktop and mobile. The public pages share the same header/footer.
-
-## Working local-demo interactions
-
-- Student sign-up (hashed password) and sign-in.
-- Sign-in for the included faculty/admin test accounts.
-- Faculty list and reservable time slots (weekday slots in the next few weeks).
-- Students can create, monitor and cancel consultation requests.
-- Faculty can approve or decline incoming requests.
-- Administrators can view all requests and overall counts, and can approve/decline pending requests.
-- Local data persistence via `backend/data/dev-db.json`.
-- HttpOnly session cookies; server checks authenticated roles before accepting changes.
-
-### Demo login credentials
-
-| Role    | Email                        | Password       |
-| ------- | ---------------------------- | -------------- |
-| Faculty | `faculty@consulttime.local`  | `DemoPass123!` |
-| Faculty | `faculty2@consulttime.local` | `DemoPass123!` |
-| Admin   | `admin@consulttime.local`    | `DemoPass123!` |
-
-Create student accounts via `/signup`. Demo accounts are **for local development only** and should NEVER be deployed publicly as-is.
-
-## Hero image
-
-If you have the original ConsultTime homepage image from the prior design, add it here:
-
-`public/consulttime-hero.jpg`
-
-The hero shows an original UI-style illustration if this image is absent. Because the latest ConsultTime source assets were not available in this conversation, the earlier hero photo cannot be automatically included.
-
-## Folder overview
-
-```text
-ConsultTime_Complete_New_Project/
-  backend/
-    server.mjs           # Node local development API
-    data/                # generated JSON database (ignored by git)
-  scripts/
-    dev.mjs              # starts frontend + backend together
-  public/
-  src/
-    components/          # header, footer, UI components
-    context/             # React auth session context
-    pages/               # Home, About, Features, Signup, Portal, etc.
-    services/            # API client
-    styles/              # red theme, typography and responsive layout
-    App.jsx
-    main.jsx
-  index.html
-  package.json
-  vite.config.js
-```
-
-## Scope and limitations
-
-**This is a functional local prototype, not a production-ready school management system.**
-
-The JSON file provides basic persistence, not a transactional multi-user database. Authentication, auditing, validation, permissions, account enrollment, credentials management, email verification, rate limits, monitoring, CSRF defenses, backup/recovery, TLS deployment and university privacy requirements need a security review and a real backend before collecting authentic student records or deploying publicly. Scheduled slots are currently predefined; they are not yet editable faculty availability calendars. `npm run build` produces the frontend only; the Node API must still run separately when deploying.
-
-Most importantly: **this ZIP is completely separate from the older ConsultTime-G6 and the SOMS project.** Use it as a new starting point, not as a patch over the existing repo.
-
-## Features page — categorized, role-filtered catalog
-
-The `/features` page now contains 25 consultation-focused capabilities organized into:
-
-1. **Plan & book consultations**
-2. **Organize your workflow**
-3. **Communicate & collaborate**
-4. **Control & analyze**
-
-Visitors can browse **All features / Students / Faculty / Administrators**, filter the feature stage (**All / In the demo / Planned**), and search by keyword. Filters, result counts, and empty states work without a backend request. The page reuses the existing 1600px SOMS-matched container and ConsultTime red gradient.
-
-**Important:** "In the demo" means that functionality is actually supported by the included local backend; "Planned" means a proposed enhancement inspired by the uploaded examples. Planned ideas (such as calendar and Kanban views, recurring office hours, real-time collaboration, email/SMS, analytics charts, and automated reminders) are **not implemented yet**. The feature catalog communicates these ideas without misrepresenting them as live. Existing sign-in, registration, backend, homepage, header, and footer are unchanged.
-
-### For updating an existing project
-
-To update the earlier standalone project without replacing its local database, copy only:
-
-- `src/pages/FeaturesPage.jsx`
-- `src/styles/features.css` (new file)
-- `src/components/Icon.jsx`
-
-Do not overwrite `backend/data/dev-db.json`. For a fresh setup, extract this entire ZIP in a new folder and run `npm install` then `npm run dev`.
-
-## November 2026 UI refinements
-
-- Features catalog toolbar: Search and All/In the demo/Planned come first, then results/reset, then role tabs.
-- Removed the '25 consultation-focused ideas' callout next to the catalog heading.
-- Clicking a role tab smoothly scrolls to the first filtered feature section (or an empty-results message); reduced-motion settings are respected.
-- Student/Faculty/Admin chips on feature cards have a red sliding-fill hover animation inspired by the supplied SOMS screen recording. Clicking them also filters by role.
-- On About Us, 'Better planning' and 'Easier connections' badges float gently like the other hero badges.
-- Original colors, responsive content width, footer, sign-up sizing, and local backend logic are retained.
-
-## UI update — Dropdowns and Feature-Card Hover (Nov 13, 2026)
-
-- Student sign-up Program/Course and Year Level menus, and Student Portal Faculty/Date/Time menus now use the same red-accented, scrollable custom dropdown. The controlled values and backend API requests are unchanged. Keyboard navigation: Arrow keys, Home/End, Enter/Space, Escape, Tab, plus click-away dismissal.
-- Feature-card Student/Faculty/Admin role labels are now **non-clickable text badges**. Hover anywhere over a feature card to animate **all** of its role labels; they no longer filter, scroll or navigate. The separate Browse by User Role controls still filter and scroll to feature sections.
-- Existing ConsultTime red gradient, SOMS-derived width/gutters, auth card sizing, navigation, footer, and floating animations remain unchanged.
+See `README_WMSU_SOURCES.md` for college/program sources and catalog limitations.
