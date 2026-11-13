@@ -4,11 +4,11 @@ export default function ResetPasswordPage() {
   return (
     <AuthFrame
       title="Password recovery"
-      description="For this standalone local prototype, password resets require the system administrator."
+      description="Password recovery currently requires help from the system administrator."
     >
       <p className="ct-auth-information">
-        For now, please contact your system administrator to recover account
-        access. No password reset emails are sent by this local demo.
+        Contact your system administrator to recover account access. Automatic
+        password-reset emails are not yet available.
       </p>
       <Link className="ct-btn ct-btn-primary ct-form-submit" to="/login">
         Return to Sign In
