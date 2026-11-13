@@ -41,8 +41,10 @@ function RouteEffects() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
+  const isPublicLanding = ["/", "/about", "/features"].includes(pathname);
   return (
-    <div className="site-shell">
+    <div className={`site-shell${isPublicLanding ? " ct-public-landing" : ""}`}>
       <RouteEffects />
       <SiteHeader />
       <main id="main-content" className="site-main">
