@@ -1,0 +1,145 @@
+/* ConsultTime custom dropdowns: replaces OS-native blue option lists with a coherent red/white theme. */
+.ct-select {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  font-weight: 500;
+}
+.ct-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  color: #31282e;
+  background: #fff;
+  border: 1px solid #e9dddd;
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 620;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+.ct-select-trigger:hover:not(:disabled) {
+  border-color: #dc9b9b;
+  background: #fffafa;
+}
+.ct-select-trigger:focus-visible,
+.ct-select.is-open .ct-select-trigger {
+  outline: none;
+  border-color: var(--ct-red, #dc0e0e);
+  box-shadow: 0 0 0 3px rgba(220, 14, 14, 0.09);
+}
+.ct-select-trigger.is-placeholder .ct-select-value {
+  color: #887f83;
+  font-weight: 500;
+}
+.ct-select-arrow {
+  flex-shrink: 0;
+  color: #807477;
+  transition:
+    transform 0.22s ease,
+    color 0.22s ease;
+}
+.ct-select.is-open .ct-select-arrow {
+  transform: rotate(180deg);
+  color: var(--ct-red, #dc0e0e);
+}
+.ct-select-trigger:disabled {
+  cursor: not-allowed;
+  background: #f8f5f5;
+  color: #a8a0a3;
+}
+.ct-select-trigger:disabled .ct-select-arrow {
+  color: #bcb4b6;
+}
+.ct-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 75;
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid #f0dada;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow:
+    0 16px 34px rgba(74, 16, 16, 0.13),
+    0 3px 9px rgba(74, 16, 16, 0.05);
+  animation: ct-select-open 0.18s ease-out both;
+  scrollbar-width: thin;
+  scrollbar-color: #e6b7b7 #fff;
+}
+.ct-select.opens-up .ct-select-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+  transform-origin: bottom center;
+}
+.ct-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 39px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #53464d;
+  font-size: 13px;
+  font-weight: 540;
+  line-height: 1.35;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+.ct-select-option.is-active {
+  background: #fff0f0;
+  color: #a90a0a;
+}
+.ct-select-option.is-selected {
+  color: #be0c0c;
+  font-weight: 750;
+}
+.ct-select-option.is-selected.is-active {
+  background: linear-gradient(100deg, #fff0f0, #ffe7e7);
+}
+.ct-select-option svg {
+  flex-shrink: 0;
+}
+.ct-select-option.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ct-portal-form .ct-select-trigger {
+  height: 50px;
+}
+@keyframes ct-select-open {
+  from {
+    opacity: 0;
+    translate: 0 -5px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-select-trigger,
+  .ct-select-arrow,
+  .ct-select-option {
+    transition: none;
+  }
+  .ct-select-menu {
+    animation: none;
+  }
+}
