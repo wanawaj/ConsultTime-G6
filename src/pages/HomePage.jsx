@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Reveal from "../components/Reveal.jsx";
 import WorkflowSteps from "../components/WorkflowSteps.jsx";
-import PortalPreview from "../components/PortalPreview.jsx";
+import LandingHero from "../components/LandingHero.jsx";
 
 const capabilities = [
   {
@@ -25,51 +25,43 @@ const capabilities = [
 export default function HomePage() {
   return (
     <div className="ct-page-home">
-      <section className="ct-container ct-hero" aria-labelledby="ct-home-title">
-        <div className="ct-hero-copy">
-          <span className="ct-eyebrow">
-            <i /> SMARTER CAMPUS CONNECTIONS
-          </span>
-          <h1 id="ct-home-title">
-            Your time matters.<span>Make every consultation count.</span>
-          </h1>
-          <p className="ct-hero-tagline">
-            Simpler scheduling. Better communication.
-          </p>
-          <p className="ct-hero-description">
-            ConsultTime brings students and faculty together through a
-            streamlined platform for requesting, organizing, and managing
-            academic consultations.
-          </p>
-          <div className="ct-hero-actions">
-            <Link to="/signup" className="ct-btn ct-btn-primary">
-              Get Started <Icon name="arrow-right" size={18} />
-            </Link>
-            <Link to="/features" className="ct-btn ct-btn-outline">
-              Explore Features <Icon name="chevron-right" size={17} />
-            </Link>
-          </div>
-          <div className="ct-hero-footnote">
-            <span className="ct-mini-icon">
-              <Icon name="check-circle" size={19} />
-            </span>
-            <strong>Built for a better consultation experience</strong>
-          </div>
-        </div>
-        <div className="ct-hero-visual">
-          <span className="ct-hero-ring ring-a" />
-          <span className="ct-hero-ring ring-b" />
-          <PortalPreview />
-          <img
-            className="ct-hero-user-image"
-            src="/consulttime-hero.jpg"
-            alt="ConsultTime consultation system visual"
-            onError={(event) => {
-              event.currentTarget.style.display = "none";
-            }}
-          />
-        </div>
-      </section>
+      <LandingHero
+        id="ct-home-title"
+        variant="home"
+        eyebrow="SMARTER CAMPUS CONNECTIONS"
+        title="Your time matters."
+        accent="Make every consultation count."
+        subtitle="Simpler scheduling. Better communication."
+        description="ConsultTime brings students and faculty together through a streamlined platform for requesting, organizing, and managing academic consultations."
+        primary={{ label: "Get Started", to: "/signup" }}
+        secondary={{ label: "Explore Features", to: "/features" }}
+        badges={[
+          {
+            icon: "check-circle",
+            title: "Organized requests",
+            text: "All in one dashboard",
+            spot: "top-left",
+          },
+          {
+            icon: "bell",
+            title: "Stay informed",
+            text: "Keep track of request status",
+            spot: "top-right",
+          },
+          {
+            icon: "calendar",
+            title: "Simple scheduling",
+            text: "Less back-and-forth",
+            spot: "bottom-left",
+          },
+          {
+            icon: "clock",
+            title: "Clear availability",
+            text: "Find a suitable time",
+            spot: "bottom-right",
+          },
+        ]}
+      />
 
       <Reveal
         as="section"
