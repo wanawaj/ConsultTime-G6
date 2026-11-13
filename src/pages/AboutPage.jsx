@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal.jsx";
 import Icon from "../components/Icon.jsx";
+import LandingHero from "../components/LandingHero.jsx";
 
 const values = [
   {
@@ -22,34 +23,42 @@ const values = [
 export default function AboutPage() {
   return (
     <div className="ct-inner-page">
-      <section className="ct-inner-hero">
-        <div className="ct-container ct-inner-hero-grid">
-          <div>
-            <span className="ct-eyebrow">ABOUT CONSULTTIME</span>
-            <h1>Better communication begins with better scheduling.</h1>
-            <p>
-              ConsultTime is a consultation management concept designed to make
-              academic appointments simpler for students, faculty, and
-              administrators.
-            </p>
-            <Link className="ct-btn ct-btn-primary" to="/features">
-              Explore What We Do <Icon name="arrow-right" size={16} />
-            </Link>
-          </div>
-          <div className="ct-about-graphic" aria-hidden="true">
-            <div className="ct-about-glow" />
-            <div className="ct-about-symbol">
-              <Icon name="calendar" size={72} />
-            </div>
-            <span className="ct-about-bubble bubble-first">
-              <Icon name="check-circle" size={22} /> Better planning
-            </span>
-            <span className="ct-about-bubble bubble-second">
-              <Icon name="users" size={22} /> Easier connections
-            </span>
-          </div>
-        </div>
-      </section>
+      <LandingHero
+        id="ct-about-title"
+        variant="about"
+        eyebrow="ABOUT CONSULTTIME"
+        title="Better communication begins"
+        accent="with better scheduling."
+        description="ConsultTime is a consultation management concept designed to make academic appointments simpler for students, faculty, and administrators."
+        primary={{ label: "Explore What We Do", to: "/features" }}
+        secondary={{ label: "Create Account", to: "/signup" }}
+        badges={[
+          {
+            icon: "check-circle",
+            title: "Better planning",
+            text: "Keep every request organized",
+            spot: "top-left",
+          },
+          {
+            icon: "users",
+            title: "Easier connections",
+            text: "Find the right faculty",
+            spot: "top-right",
+          },
+          {
+            icon: "shield",
+            title: "Role-based access",
+            text: "Dedicated user experiences",
+            spot: "bottom-left",
+          },
+          {
+            icon: "clock",
+            title: "Respect for time",
+            text: "Coordinate with less effort",
+            spot: "bottom-right",
+          },
+        ]}
+      />
       <section className="ct-container ct-section">
         <Reveal className="ct-section-heading">
           <span className="ct-eyebrow">WHAT DRIVES US</span>
