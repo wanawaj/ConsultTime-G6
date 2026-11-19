@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import crypto from 'node:crypto'
+import { validateMessageInput } from './message-utils.mjs'
 import { promisify } from 'node:util'
 import { validPassword } from '../src/utils/passwordRules.js'
 import { validStudentId } from '../src/utils/studentId.js'
@@ -48,6 +49,7 @@ async function seed() {
   return { version: 1, users, appointments: [] }
 }
 const db = fs.existsSync(dataPath) ? JSON.parse(fs.readFileSync(dataPath, 'utf8')) : await seed()
+db.messages ||= []
 function save() {
   const tmp = `${dataPath}.tmp`
   fs.writeFileSync(tmp, JSON.stringify(db, null, 2), { mode: 0o600 })
@@ -80,7 +82,7 @@ async function bodyJSON(req) {
   let total = 0
   for await (const chunk of req) {
     total += chunk.length
-    if (total > 20_000) throw new Error('Request too large.')
+    if (total > (req.url === '/api/messages' ? 600_000 : 20_000)) throw new Error('Request too large.')
     chunks.push(chunk)
   }
   const raw = Buffer.concat(chunks).toString('utf8')
@@ -90,6 +92,10 @@ async function bodyJSON(req) {
 }
 const validEmail = (text) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text || '') && text.length <= 160
 const textField = (v, max=200) => String(v || '').trim().slice(0,max)
+const publicMessage = (m) => {
+  const { attachmentData, attachmentType, ...safe } = m
+  return { ...safe, hasAttachment: Boolean(attachmentData) }
+}
 const getFaculty = () => db.users.filter(u => u.role === 'faculty').map(u=>cleanUser(u))
 const getAppointments = user => db.appointments.filter(a => user.role === 'admin' || (user.role === 'faculty' ? a.facultyId === user.id : a.studentId === user.id)).map(a => {
   const faculty = db.users.find(u=>u.id===a.facultyId)
@@ -104,7 +110,20 @@ const server = http.createServer(async (req, res) => {
   if (method === 'OPTIONS') return bad(res, 'Not supported.', 405)
   if (!url.pathname.startsWith('/api/')) return bad(res, 'API routes begin with /api.', 404)
   // Prevent cross-site form submissions; Vite development proxy shares the page origin.
-  if (['POST','PUT','PATCH','DELETE'].includes(method) && req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) return bad(res, 'Cross-origin request rejected.', 403)
+  if (['POST','PUT','PATCH','DELETE'].includes(method) && req.headers.origin) {
+    let permitted = false
+    try {
+      const origin = new URL(req.headers.origin)
+      const sameOrigin = origin.host === req.headers.host
+      // Vite's local proxy forwards the browser Origin to port 3001.
+      const localViteProxy = origin.protocol === 'http:' &&
+        ['localhost', '127.0.0.1'].includes(origin.hostname) &&
+        ['5173', '5174'].includes(origin.port) &&
+        ['localhost', '127.0.0.1'].some(name => req.headers.host === `${name}:${port}`)
+      permitted = sameOrigin || localViteProxy
+    } catch { /* malformed origins are rejected */ }
+    if (!permitted) return bad(res, 'Cross-origin request rejected.', 403)
+  }
   try {
     if (method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ok: true, mode: 'local-development' })
     if (method === 'GET' && url.pathname === '/api/me') return send(res, 200, { user: cleanUser(currentUser(req)) })
@@ -143,6 +162,44 @@ const server = http.createServer(async (req, res) => {
     }
     const user = currentUser(req)
     if (!user) return bad(res, 'Please sign in first.', 401)
+    // Messages are visible only to their sender or recipient. Students can
+    // contact faculty; faculty can reply to students in an existing thread.
+    if (method === 'GET' && url.pathname === '/api/messages') {
+      const messages = db.messages.filter(m => m.senderId === user.id || m.recipientId === user.id)
+        .sort((a,b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 200)
+        .map(publicMessage)
+      return send(res, 200, { messages })
+    }
+    const fileMatch = url.pathname.match(/^\/api\/messages\/([^/]+)\/attachment$/)
+    if (method === 'GET' && fileMatch) {
+      const m = db.messages.find(x => x.id === fileMatch[1] && (x.senderId === user.id || x.recipientId === user.id))
+      if (!m || !m.attachmentData) return bad(res, 'Attachment not found.', 404)
+      return send(res, 200, { name: m.attachmentName, type: 'application/octet-stream', data: m.attachmentData })
+    }
+    if (method === 'POST' && url.pathname === '/api/messages') {
+      if (!['student','faculty'].includes(user.role)) return bad(res, 'Messaging is for students and faculty.', 403)
+      const data = await bodyJSON(req)
+      let input
+      try { input = validateMessageInput(data) } catch (err) { return bad(res, err.message) }
+      const recipient = db.users.find(u => u.id === input.recipientId)
+      if (!recipient || recipient.id === user.id || !((user.role === 'student' && recipient.role === 'faculty') || (user.role === 'faculty' && recipient.role === 'student'))) return bad(res, 'Choose an eligible student or faculty recipient.', 403)
+      if (user.role === 'faculty' && !input.threadId) return bad(res, 'Faculty can reply to existing student messages only.', 403)
+      if (input.threadId) {
+        const originals = db.messages.filter(m => m.threadId === input.threadId)
+        if (!originals.length || !originals.some(m => (m.senderId === user.id && m.recipientId === recipient.id) || (m.recipientId === user.id && m.senderId === recipient.id))) return bad(res, 'You cannot access that conversation.', 403)
+      }
+      if (db.messages.filter(m => m.senderId === user.id && Date.now() - Date.parse(m.createdAt) < 3600000).length >= 25) return bad(res, 'Hourly message limit reached.', 429)
+      const message = {
+        id: crypto.randomUUID(), threadId: input.threadId || crypto.randomUUID(),
+        senderId: user.id, recipientId: recipient.id, subject: input.subject, body: input.body,
+        senderName: `${user.firstName} ${user.lastName}`, senderEmail: user.email,
+        recipientName: `${recipient.firstName} ${recipient.lastName}`, recipientEmail: recipient.email,
+        attachmentName: input.attachment?.name || null, attachmentType: input.attachment?.type || null,
+        attachmentData: input.attachment?.bytes.toString('base64') || null, createdAt: new Date().toISOString(),
+      }
+      db.messages.push(message); save()
+      return send(res, 201, { message: publicMessage(message) })
+    }
     if (method === 'GET' && url.pathname === '/api/faculty') return send(res,200,{faculty:getFaculty()})
     if (method === 'GET' && url.pathname === '/api/slots') {
       const facultyId=url.searchParams.get('facultyId')

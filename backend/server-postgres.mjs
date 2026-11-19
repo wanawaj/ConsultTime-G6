@@ -1,5 +1,6 @@
 import http from 'node:http'
 import crypto from 'node:crypto'
+import { validateMessageInput } from './message-utils.mjs'
 import { pool, ensureSchema, closePool } from './db/postgres.mjs'
 import { hashPassword, verifyPassword, hashToken, safeSecretEquals } from './db/auth.mjs'
 import { userById, facultyList } from './db/users.mjs'
@@ -37,7 +38,7 @@ async function bodyJSON(req) {
   let total = 0
   for await (const chunk of req) {
     total += chunk.length
-    if (total > 20_000) {
+    if (total > (req.url === '/api/messages' ? 600_000 : 20_000)) {
       const error = new Error('Request too large.')
       error.status = 413
       throw error
@@ -188,6 +189,50 @@ const server = http.createServer(async (req, res) => {
     const user = await currentUser(req)
     if (!user) return bad(res, 'Please sign in first.', 401)
 
+    if (method === 'GET' && url.pathname === '/api/messages') {
+      if (!['student','faculty'].includes(user.role)) return bad(res, 'Messaging is for students and faculty.', 403)
+      const { rows } = await pool.query(`
+        SELECT m.id, m.thread_id AS "threadId", m.sender_id AS "senderId", m.recipient_id AS "recipientId",
+               m.subject, m.body, m.attachment_name AS "attachmentName",
+               (m.attachment_content IS NOT NULL) AS "hasAttachment", m.created_at AS "createdAt",
+               CONCAT(s.first_name, ' ', s.last_name) AS "senderName", s.email AS "senderEmail",
+               CONCAT(r.first_name, ' ', r.last_name) AS "recipientName", r.email AS "recipientEmail"
+        FROM ct_messages m JOIN ct_users s ON s.id=m.sender_id JOIN ct_users r ON r.id=m.recipient_id
+        WHERE m.sender_id=$1 OR m.recipient_id=$1 ORDER BY m.created_at DESC LIMIT 200`, [user.id])
+      return send(res, 200, { messages: rows })
+    }
+    const fileMatch = url.pathname.match(/^\/api\/messages\/([^/]+)\/attachment$/)
+    if (method === 'GET' && fileMatch) {
+      const { rows } = await pool.query(`SELECT attachment_name AS name, encode(attachment_content, 'base64') AS data
+        FROM ct_messages WHERE id=$1 AND (sender_id=$2 OR recipient_id=$2)`, [fileMatch[1], user.id])
+      if (!rows.length || !rows[0].data) return bad(res, 'Attachment not found.', 404)
+      return send(res, 200, { name: rows[0].name, type: 'application/octet-stream', data: rows[0].data.replace(/\s/g, '') })
+    }
+    if (method === 'POST' && url.pathname === '/api/messages') {
+      if (!['student','faculty'].includes(user.role)) return bad(res, 'Messaging is for students and faculty.', 403)
+      const data = await bodyJSON(req)
+      let input
+      try { input = validateMessageInput(data) } catch (err) { return bad(res, err.message) }
+      const { rows: recipients } = await pool.query('SELECT id, role FROM ct_users WHERE id=$1', [input.recipientId])
+      const recipient = recipients[0]
+      if (!recipient || recipient.id === user.id || !((user.role === 'student' && recipient.role === 'faculty') || (user.role === 'faculty' && recipient.role === 'student'))) return bad(res, 'Choose an eligible student or faculty recipient.', 403)
+      if (user.role === 'faculty' && !input.threadId) return bad(res, 'Faculty can reply to existing student messages only.', 403)
+      if (input.threadId) {
+        const { rowCount } = await pool.query(`SELECT 1 FROM ct_messages WHERE thread_id=$1
+          AND ((sender_id=$2 AND recipient_id=$3) OR (recipient_id=$2 AND sender_id=$3)) LIMIT 1`,
+          [input.threadId, user.id, recipient.id])
+        if (!rowCount) return bad(res, 'You cannot access that conversation.', 403)
+      }
+      const { rows: limits } = await pool.query(`SELECT COUNT(*)::int AS total FROM ct_messages
+        WHERE sender_id=$1 AND created_at > NOW() - INTERVAL '1 hour'`, [user.id])
+      if (limits[0].total >= 25) return bad(res, 'Hourly message limit reached.', 429)
+      const id = crypto.randomUUID(), threadId = input.threadId || crypto.randomUUID()
+      await pool.query(`INSERT INTO ct_messages
+        (id, thread_id, sender_id, recipient_id, subject, body, attachment_name, attachment_type, attachment_content)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, [id, threadId, user.id, recipient.id, input.subject, input.body,
+        input.attachment?.name || null, input.attachment?.type || null, input.attachment?.bytes || null])
+      return send(res, 201, { id, threadId })
+    }
     if (method === 'GET' && url.pathname === '/api/faculty') {
       return send(res, 200, { faculty: await facultyList(pool) })
     }

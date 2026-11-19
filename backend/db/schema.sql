@@ -45,3 +45,22 @@ CREATE UNIQUE INDEX IF NOT EXISTS ct_unique_active_slot
 
 CREATE INDEX IF NOT EXISTS ct_appointments_student_idx ON ct_appointments(student_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS ct_appointments_faculty_idx ON ct_appointments(faculty_id, created_at DESC);
+
+
+-- University communication: private messages between a student and faculty member.
+-- The API enforces participant access to messages.
+CREATE TABLE IF NOT EXISTS ct_messages (
+  id TEXT PRIMARY KEY,
+  thread_id TEXT NOT NULL,
+  sender_id TEXT NOT NULL REFERENCES ct_users(id) ON DELETE CASCADE,
+  recipient_id TEXT NOT NULL REFERENCES ct_users(id) ON DELETE CASCADE,
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL,
+  attachment_name TEXT,
+  attachment_type TEXT,
+  attachment_content BYTEA,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS ct_messages_sender_idx ON ct_messages(sender_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ct_messages_recipient_idx ON ct_messages(recipient_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ct_messages_thread_idx ON ct_messages(thread_id, created_at);
