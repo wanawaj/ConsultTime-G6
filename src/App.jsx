@@ -10,6 +10,7 @@ import LoginPage from "./components/LoginPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import PortalPage from "./pages/PortalPage.jsx";
+import { useAuth } from "./context/AuthContext.jsx";
 
 const titles = {
   "/": "Home",
@@ -42,11 +43,13 @@ function RouteEffects() {
 
 export default function App() {
   const { pathname } = useLocation();
+  const { user } = useAuth();
+  const isStudentPortal = pathname === "/portal" && user?.role === "student";
   const isPublicLanding = ["/", "/about", "/features"].includes(pathname);
   return (
     <div className={`site-shell${isPublicLanding ? " ct-public-landing" : ""}`}>
       <RouteEffects />
-      <SiteHeader />
+      {!isStudentPortal && <SiteHeader />}
       <main id="main-content" className="site-main">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -60,7 +63,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
-      <SiteFooter />
+      {!isStudentPortal && <SiteFooter />}
     </div>
   );
 }
