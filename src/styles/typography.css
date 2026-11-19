@@ -1,0 +1,30 @@
+/* ConsultTime typography V5.
+   Display: a licensed-for-web, free high-contrast serif close to the HUOVA reference.
+   Text: use a separately licensed Hagrid Text if available, with a free DM Sans fallback.
+   Never bundle/distribute paid font files inside this project. */
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600;6..96,700&family=DM+Sans:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --ct-font-display: "Bodoni Moda", Didot, "Times New Roman", serif;
+  --ct-font-body: "Hagrid Text", "DM Sans", Inter, "Segoe UI", Arial, sans-serif;
+}
+body, button, input, select, textarea { font-family: var(--ct-font-body); }
+/* Headings across landing, features, registration, portals, calendars, and dialogs. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ct-font-display);
+  font-weight: 600;
+  font-optical-sizing: auto;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+/* Preserve strong brand legibility and existing form-label styling. */
+.site-shell .csd-app, .site-shell .ctmsg-root { font-family: var(--ct-font-body); }
+.ct-features-page .ct-catalog-card h3 { font-family: var(--ct-font-display); font-weight: 600; letter-spacing: -0.025em; }
+.ct-features-page .ct-catalog-heading h2,
+.ct-features-page .ct-catalog-group-copy h3 { letter-spacing: -0.028em; line-height: 1.17; }
+/* Display serif needs slightly more line height and less artificial heavy weight. */
+.ct-public-landing h1, .ct-public-landing h2, .ct-public-landing h3,
+.ct-features-page h1, .ct-features-page h2, .ct-features-page h3 { font-weight: 600; }
+@media (max-width: 640px) {
+  .ct-features-page .ct-catalog-heading h2 { line-height: 1.18; }
+}
