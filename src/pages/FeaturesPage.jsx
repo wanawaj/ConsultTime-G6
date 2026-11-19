@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal.jsx";
 import Icon from "../components/Icon.jsx";
+import SelectField from "../components/SelectField.jsx";
 import WorkflowSteps from "../components/WorkflowSteps.jsx";
 import LandingHero from "../components/LandingHero.jsx";
 import "../styles/features.css";
 
 // The descriptions and availability flags reflect the features currently implemented in this build.
-// "planned" items are concepts for future development, NOT working product features.
+// Planned items require further backend work or external delivery services; only tested features are marked Developed.
 const roles = [
-  { id: "all", label: "All features", icon: "layers" },
+  { id: "all", label: "All roles", icon: "layers" },
   { id: "student", label: "Students", icon: "graduation" },
   { id: "faculty", label: "Faculty", icon: "users" },
   { id: "admin", label: "Administrators", icon: "shield" },
@@ -71,17 +72,17 @@ const groups = [
         id: "recurring",
         title: "Recurring office hours",
         icon: "repeat",
-        status: "planned",
-        roles: ["faculty", "admin"],
-        text: "Set weekly consultation hours and automatically offer repeating availability to students.",
+        status: "available",
+        roles: ["faculty"],
+        text: "Faculty can save weekly consultation times; student slot availability follows the saved schedule.",
       },
       {
         id: "followups",
         title: "Linked follow-up sessions",
         icon: "network",
-        status: "planned",
+        status: "available",
         roles: ["student", "faculty"],
-        text: "Connect related consultations and track follow-up sessions for ongoing academic concerns.",
+        text: "Students can link a new request to their approved or completed consultation, and both records show the follow-up relationship.",
       },
     ],
   },
@@ -106,33 +107,33 @@ const groups = [
         id: "calendar-view",
         title: "Consultation calendar",
         icon: "calendar",
-        status: "planned",
+        status: "available",
         roles: ["student", "faculty", "admin"],
-        text: "View appointments by day, week, or month in a dedicated academic consultation calendar.",
+        text: "Students, faculty, and administrators can navigate appointment dates in a week/month calendar.",
       },
       {
         id: "kanban",
         title: "Request status board",
         icon: "columns",
-        status: "planned",
+        status: "available",
         roles: ["faculty", "admin"],
-        text: "Organize consultation requests by Pending, Approved, Declined, and Completed stages.",
+        text: "Faculty and administrators can switch from a list to a grouped request status board.",
       },
       {
         id: "timeline",
         title: "Consultation timeline",
         icon: "history",
-        status: "planned",
+        status: "available",
         roles: ["student", "faculty", "admin"],
-        text: "See consultation milestones, follow-up dates, and scheduled sessions along a timeline.",
+        text: "Open any consultation record to view its dated status activity and discussion notes.",
       },
       {
         id: "archive",
         title: "Consultation archive",
         icon: "archive",
-        status: "planned",
+        status: "available",
         roles: ["student", "faculty", "admin"],
-        text: "Keep completed sessions accessible while separating them from active consultation requests.",
+        text: "Filter student consultation history to view completed sessions separately from active requests.",
       },
       {
         id: "fields",
@@ -163,27 +164,27 @@ const groups = [
       },
       {
         id: "automation",
-        title: "Automated workflow actions",
+        title: "Automatic status activity",
         icon: "settings",
-        status: "planned",
-        roles: ["faculty", "admin"],
-        text: "Trigger appropriate next steps when a consultation request is created or its status changes.",
+        status: "available",
+        roles: ["student", "faculty", "admin"],
+        text: "Requests and status decisions automatically create dated activity records; students receive in-app update alerts.",
       },
       {
         id: "alerts",
         title: "Smart reminders & alerts",
         icon: "bell",
-        status: "planned",
-        roles: ["student", "faculty", "admin"],
-        text: "Get reminders about upcoming consultations, changes, and unanswered requests.",
+        status: "available",
+        roles: ["student"],
+        text: "In-app reminders highlight approved sessions approaching within 24 hours; status changes appear on the student dashboard.",
       },
       {
         id: "activity",
         title: "Activity log & discussion",
         icon: "message-square",
-        status: "planned",
+        status: "available",
         roles: ["student", "faculty"],
-        text: "Keep consultation notes, messages, and status activity together with each appointment.",
+        text: "Consultation participants can post private appointment notes, with dated changes and decisions in a shared activity timeline.",
       },
       {
         id: "email",
@@ -240,25 +241,25 @@ const groups = [
         id: "analytics",
         title: "Consultation analysis",
         icon: "activity",
-        status: "planned",
+        status: "available",
         roles: ["faculty", "admin"],
-        text: "Understand consultation volume, common request types, outcomes, and busy periods.",
+        text: "Faculty and administrators can explore request counts, common categories, completed durations, and monthly activity.",
       },
       {
         id: "time",
         title: "Session time tracking",
         icon: "timer",
-        status: "planned",
+        status: "available",
         roles: ["faculty", "admin"],
-        text: "Record actual consultation durations to better estimate workload and future availability.",
+        text: "Faculty can mark approved sessions completed and record actual minutes spent.",
       },
       {
         id: "reports",
         title: "Visual graphs & reports",
         icon: "bar-chart",
-        status: "planned",
+        status: "available",
         roles: ["admin"],
-        text: "Explore trends through charts and summary reports for academic consultation planning.",
+        text: "Administrators can view visual status/monthly charts and export consultation records as CSV.",
       },
     ],
   },
@@ -275,14 +276,18 @@ function FeatureCard({ feature, index }) {
           className={`ct-catalog-status ${feature.status === "available" ? "is-available" : "is-planned"}`}
         >
           <span aria-hidden="true" className="ct-catalog-status-dot" />
-          {feature.status === "available" ? "In the demo" : "Planned"}
+          {feature.status === "available" ? "Developed" : "Planned"}
         </span>
       </div>
       <h3>{feature.title}</h3>
       <p>{feature.text}</p>
       <div className="ct-catalog-roles" aria-label="Relevant user roles">
-        {feature.roles.map((role) => (
-          <span className="ct-catalog-role-chip" key={role}>
+        {feature.roles.map((role, roleIndex) => (
+          <span
+            className="ct-catalog-role-chip"
+            key={role}
+            style={{ "--role-delay": `${roleIndex * 125}ms` }}
+          >
             <span>{roleNames[role]}</span>
           </span>
         ))}
@@ -295,9 +300,6 @@ export default function FeaturesPage() {
   const [activeRole, setActiveRole] = useState("all");
   const [activeStatus, setActiveStatus] = useState("all");
   const [search, setSearch] = useState("");
-  const firstGroupRef = useRef(null);
-  const emptyResultsRef = useRef(null);
-  const [scrollRequest, setScrollRequest] = useState(0);
   const trimmedSearch = search.trim().toLowerCase();
 
   const visibleGroups = useMemo(
@@ -337,29 +339,6 @@ export default function FeaturesPage() {
     setActiveStatus("all");
     setSearch("");
   };
-
-  // A role selection changes the catalog and then moves to its first matching group.
-  // The counter also allows re-clicking the selected role to scroll there again.
-  const chooseRole = (role) => {
-    setActiveRole(role);
-    setScrollRequest((request) => request + 1);
-  };
-
-  useEffect(() => {
-    if (!scrollRequest) return;
-    const frame = window.requestAnimationFrame(() => {
-      const target = firstGroupRef.current || emptyResultsRef.current;
-      if (!target) return;
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      target.scrollIntoView({
-        behavior: reduced ? "auto" : "smooth",
-        block: "start",
-      });
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [scrollRequest]);
 
   return (
     <div className="ct-inner-page ct-features-page">
@@ -411,52 +390,50 @@ export default function FeaturesPage() {
             <h2 id="ct-catalog-title">Explore what ConsultTime can do.</h2>
             <p>
               Find the tools that matter to your role, from everyday scheduling
-              to future consultation-management enhancements.
+              to the features already built and the integrations still in development.
             </p>
           </div>
         </Reveal>
 
         <div className="ct-feature-filter-wrap">
           <div className="ct-catalog-refine-row">
-            <label className="ct-catalog-search">
-              <Icon name="search" size={18} />
-              <input
-                type="search"
-                placeholder="Search features..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                aria-label="Search ConsultTime features"
-              />
+            <label className="ct-catalog-filter-field ct-catalog-search-field">
+              <span className="ct-catalog-filter-caption">Search features</span>
+              <span className="ct-catalog-search">
+                <Icon name="search" size={18} />
+                <input
+                  type="search"
+                  placeholder="Search features..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </span>
             </label>
-            <div
-              className="ct-catalog-stage-filter"
-              role="group"
-              aria-label="Filter by availability"
-            >
-              <button
-                type="button"
-                className={activeStatus === "all" ? "active" : ""}
-                aria-pressed={activeStatus === "all"}
-                onClick={() => setActiveStatus("all")}
-              >
-                All
-              </button>
-              <button
-                type="button"
-                className={activeStatus === "available" ? "active" : ""}
-                aria-pressed={activeStatus === "available"}
-                onClick={() => setActiveStatus("available")}
-              >
-                In the demo
-              </button>
-              <button
-                type="button"
-                className={activeStatus === "planned" ? "active" : ""}
-                aria-pressed={activeStatus === "planned"}
-                onClick={() => setActiveStatus("planned")}
-              >
-                Planned
-              </button>
+            <div className="ct-catalog-filter-field ct-catalog-select-field">
+              <span className="ct-catalog-filter-caption" id="ct-catalog-role-label">
+                User role
+              </span>
+              <SelectField
+                value={activeRole}
+                onChange={setActiveRole}
+                labelId="ct-catalog-role-label"
+                options={roles.map(({ id, label }) => ({ value: id, label }))}
+              />
+            </div>
+            <div className="ct-catalog-filter-field ct-catalog-select-field">
+              <span className="ct-catalog-filter-caption" id="ct-catalog-stage-label">
+                Feature stage
+              </span>
+              <SelectField
+                value={activeStatus}
+                onChange={setActiveStatus}
+                labelId="ct-catalog-stage-label"
+                options={[
+                  { value: "all", label: "All stages" },
+                  { value: "available", label: "Developed" },
+                  { value: "planned", label: "Planned" },
+                ]}
+              />
             </div>
           </div>
           <div className="ct-catalog-results">
@@ -477,39 +454,12 @@ export default function FeaturesPage() {
               Reset filters <Icon name="refresh-cw" size={14} />
             </button>
           </div>
-          <div className="ct-catalog-role-filter">
-            <div className="ct-feature-filter-label">
-              <span>Browse by user role</span>
-              <span className="ct-feature-filter-hint">
-                Choose a role to jump to its features.
-              </span>
-            </div>
-            <div
-              className="ct-catalog-role-tabs"
-              role="group"
-              aria-label="Filter by user role"
-            >
-              {roles.map((role) => (
-                <button
-                  key={role.id}
-                  type="button"
-                  aria-pressed={activeRole === role.id}
-                  className={`ct-catalog-role-tab${activeRole === role.id ? " active" : ""}`}
-                  onClick={() => chooseRole(role.id)}
-                >
-                  <Icon name={role.icon} size={17} />
-                  {role.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {visibleCount ? (
           <div className="ct-catalog-sections">
-            {visibleGroups.map((group, groupIndex) => (
+            {visibleGroups.map((group) => (
               <section
-                ref={groupIndex === 0 ? firstGroupRef : undefined}
                 className="ct-catalog-group"
                 key={group.id}
                 aria-labelledby={`ct-group-${group.id}`}
@@ -539,7 +489,7 @@ export default function FeaturesPage() {
             ))}
           </div>
         ) : (
-          <div ref={emptyResultsRef} className="ct-catalog-empty">
+          <div className="ct-catalog-empty">
             <span className="ct-catalog-empty-icon">
               <Icon name="search" size={27} />
             </span>
@@ -558,7 +508,7 @@ export default function FeaturesPage() {
         <div className="ct-catalog-roadmap-note">
           <Icon name="check-circle" size={19} />
           <p>
-            <strong>What do the labels mean?</strong> <b>In the demo</b>{" "}
+            <strong>What do the labels mean?</strong> <b>Developed</b>{" "}
             identifies functionality currently provided in this ConsultTime
             build. <b>Planned</b> identifies ideas inspired by your references
             that still need to be developed, tested, and connected to the

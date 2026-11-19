@@ -33,57 +33,6 @@
   padding: 25px 28px 23px;
   box-shadow: 0 9px 32px rgba(66, 14, 14, 0.035);
 }
-.ct-feature-filter-label {
-  display: flex;
-  gap: 15px;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.ct-feature-filter-label > span:first-child {
-  font-size: 13px;
-  font-weight: 850;
-  color: #2d2528;
-}
-.ct-feature-filter-hint {
-  font-size: 12px;
-  color: #8a7b80;
-}
-.ct-catalog-role-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 11px;
-}
-.ct-catalog-role-tab {
-  border: 1px solid #f0e3e3;
-  background: #fff;
-  color: #695c60;
-  padding: 14px 14px;
-  min-height: 51px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border-radius: 11px;
-  font-size: 13px;
-  font-weight: 800;
-  transition:
-    background 0.18s,
-    color 0.18s,
-    border-color 0.18s,
-    box-shadow 0.18s;
-}
-.ct-catalog-role-tab:hover {
-  border-color: #e6a8a8;
-  color: #a70c0c;
-  background: #fff9f9;
-}
-.ct-catalog-role-tab.active {
-  background: var(--ct-gradient);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 6px 17px rgba(192, 14, 14, 0.16);
-}
 .ct-catalog-refine-row {
   display: flex;
   align-items: center;
@@ -118,34 +67,6 @@
 }
 .ct-catalog-search input::placeholder {
   color: #9b9598;
-}
-.ct-catalog-stage-filter {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f8f5f5;
-  border: 1px solid #f2eded;
-  border-radius: 10px;
-  padding: 4px;
-}
-.ct-catalog-stage-filter button {
-  background: none;
-  border: 0;
-  border-radius: 7px;
-  min-height: 33px;
-  padding: 7px 13px;
-  font-size: 12px;
-  font-weight: 750;
-  color: #8a7d82;
-  white-space: nowrap;
-}
-.ct-catalog-stage-filter button:hover {
-  color: #af1414;
-}
-.ct-catalog-stage-filter button.active {
-  background: #fff;
-  color: #ae1616;
-  box-shadow: 0 2px 8px rgba(70, 12, 12, 0.065);
 }
 .ct-catalog-results {
   display: flex;
@@ -371,12 +292,6 @@
   position: relative;
   z-index: 1;
 }
-.ct-catalog-role-filter {
-  border-top: 1px solid #f4eeee;
-  margin-top: 21px;
-  padding-top: 20px;
-}
-
 .ct-catalog-empty {
   text-align: center;
   border: 1px dashed #e7cdcd;
@@ -440,9 +355,6 @@
   .ct-catalog-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .ct-catalog-role-tabs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .ct-catalog-heading {
     margin-bottom: 27px;
   }
@@ -466,28 +378,6 @@
   }
   .ct-feature-filter-hint {
     display: none;
-  }
-  .ct-catalog-role-tab {
-    font-size: 12px;
-    min-height: 45px;
-    padding: 10px;
-  }
-  .ct-catalog-refine-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 13px;
-  }
-  .ct-catalog-search {
-    width: 100%;
-  }
-  .ct-catalog-stage-filter {
-    width: 100%;
-    justify-content: stretch;
-  }
-  .ct-catalog-stage-filter button {
-    flex: 1;
-    padding-inline: 6px;
-    font-size: 11px;
   }
   .ct-catalog-grid {
     grid-template-columns: 1fr;
@@ -524,23 +414,104 @@
     margin-top: 34px;
   }
 }
-@media (max-width: 390px) {
-  .ct-catalog-role-tab {
-    gap: 6px;
-  }
-  .ct-catalog-role-tab svg {
-    width: 15px;
-    height: 15px;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .ct-catalog-card,
-  .ct-catalog-role-tab,
   .ct-catalog-role-chip,
   .ct-catalog-role-chip::before {
     transition: none;
   }
   .ct-catalog-card:hover {
     transform: none;
+  }
+}
+
+/* V5: concise filters using ConsultTime's existing styled dropdown component. */
+.ct-catalog-refine-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(155px, 205px) minmax(155px, 205px);
+  align-items: end;
+  gap: 16px;
+}
+.ct-catalog-filter-field { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.ct-catalog-filter-caption { font-size: 12px; color: #55484e; font-weight: 700; }
+.ct-catalog-search { width: 100%; height: 48px; background: #fff; }
+.ct-catalog-search-field { cursor: text; }
+.ct-catalog-select-field .ct-select { width: 100%; }
+.ct-catalog-select-field .ct-select-trigger {
+  height: 48px;
+  border-radius: 10px;
+  border-color: #ece0e0;
+  background: #fff;
+}
+.ct-catalog-select-field .ct-select-trigger:hover { background: #fff9f8; }
+.ct-catalog-select-field .ct-select-menu { z-index: 90; }
+.ct-feature-filter-wrap { padding: 22px 26px 19px; }
+.ct-catalog-results { margin-top: 16px; }
+
+/* V5.1: restore the original V4 upward Reveal animation on the full
+   feature cards. Domino motion belongs to the small role labels only. */
+.ct-catalog-card.ct-reveal .ct-catalog-role-chip {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition:
+    opacity 0.42s cubic-bezier(0.2, 0.72, 0.25, 1),
+    transform 0.42s cubic-bezier(0.2, 0.72, 0.25, 1),
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.ct-catalog-card.ct-reveal.visible .ct-catalog-role-chip {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay:
+    calc(var(--reveal-delay, 0ms) + var(--role-delay, 0ms) + 120ms),
+    calc(var(--reveal-delay, 0ms) + var(--role-delay, 0ms) + 120ms),
+    0ms,
+    0ms,
+    0ms;
+}
+/* On card hover, the role labels fill one after another: Student,
+   Faculty, then Admin where those roles are present. */
+.ct-catalog-card.ct-reveal.visible:hover .ct-catalog-role-chip,
+.ct-catalog-card.ct-reveal.visible:focus-within .ct-catalog-role-chip {
+  transition-delay:
+    0ms,
+    0ms,
+    var(--role-delay, 0ms),
+    var(--role-delay, 0ms),
+    var(--role-delay, 0ms);
+}
+.ct-catalog-card:hover .ct-catalog-role-chip::before,
+.ct-catalog-card:focus-within .ct-catalog-role-chip::before {
+  transition-delay: var(--role-delay, 0ms);
+}
+/* When the pointer leaves, all chips return promptly. */
+.ct-catalog-role-chip::before {
+  transition-delay: 0ms;
+}
+@media (max-width: 880px) {
+  .ct-catalog-refine-row {
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 0.55fr);
+  }
+  .ct-catalog-search-field { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .ct-feature-filter-wrap { padding: 19px 18px; }
+  .ct-catalog-refine-row { grid-template-columns: 1fr 1fr; gap: 13px; }
+  .ct-catalog-select-field .ct-select-trigger { padding-inline: 11px; font-size: 12px; }
+}
+@media (max-width: 390px) {
+  .ct-catalog-refine-row { grid-template-columns: 1fr; }
+  .ct-catalog-search-field { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-catalog-card.ct-reveal .ct-catalog-role-chip,
+  .ct-catalog-card.ct-reveal.visible .ct-catalog-role-chip {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ct-catalog-role-chip::before {
+    transition: none;
   }
 }
