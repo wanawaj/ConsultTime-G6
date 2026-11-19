@@ -68,6 +68,13 @@ export default function LoginPage() {
       <p className="ct-auth-switch">
         New to ConsultTime? <Link to="/signup">Create an account</Link>
       </p>
+
+      <p className="ct-auth-switch">
+        Haven't verified your WMSU email yet?{" "}
+        <Link to="/verify-email" state={{ email: email.trim().toLowerCase() }}>
+          Verify Email
+        </Link>
+      </p>
       <p className="ct-auth-demo-note">
         Use a ConsultTime account created or provided for this system.
       </p>

@@ -10,6 +10,7 @@ import LoginPage from "./components/LoginPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import PortalPage from "./pages/PortalPage.jsx";
+import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
 
 const titles = {
   "/": "Home",
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/portal" element={<PortalPage />} />
           <Route path="/register" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ResetPasswordPage />} />
