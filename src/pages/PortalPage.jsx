@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../services/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Icon from "../components/Icon.jsx";
-import SelectField from "../components/SelectField.jsx";
+import StudentDashboard from "./StudentDashboard.jsx";
+import MessageCenter from "../components/MessageCenter.jsx";
 
 const niceDate = (value) => {
   if (!value) return "—";
@@ -126,6 +127,18 @@ export default function PortalPage() {
       </div>
     );
   const isStudent = user.role === "student";
+  if (isStudent) {
+    return (
+      <StudentDashboard
+        user={user} faculty={faculty} appointments={appointments}
+        facultyId={facultyId} setFacultyId={setFacultyId}
+        date={date} setDate={setDate} time={time} setTime={setTime}
+        topic={topic} setTopic={setTopic} notes={notes} setNotes={setNotes}
+        days={days} times={times} busy={busy} message={message} error={error}
+        createRequest={createRequest} changeStatus={changeStatus} refresh={refresh}
+      />
+    );
+  }
   const openRequests = appointments.filter(
     (a) => a.status === "Pending",
   ).length;
@@ -197,96 +210,7 @@ export default function PortalPage() {
             {error}
           </p>
         )}
-        {isStudent && (
-          <section
-            className="ct-portal-panel"
-            aria-labelledby="new-appointment"
-          >
-            <div className="ct-portal-panel-head">
-              <div>
-                <span className="ct-eyebrow">BOOK A CONSULTATION</span>
-                <h2 id="new-appointment">Request a faculty consultation</h2>
-                <p>Available weekdays are shown for the upcoming weeks.</p>
-              </div>
-              <Icon name="calendar" size={27} />
-            </div>
-            <form className="ct-portal-form" onSubmit={createRequest}>
-              <div className="ct-field">
-                <span id="ct-faculty-label">Faculty member</span>
-                <SelectField
-                  labelId="ct-faculty-label"
-                  name="facultyId"
-                  value={facultyId}
-                  onChange={(v) => {
-                    setFacultyId(v);
-                    setDate("");
-                    setTime("");
-                  }}
-                  placeholder="Choose faculty"
-                  options={faculty.map((f) => ({
-                    value: f.id,
-                    label: `${f.firstName} ${f.lastName} — ${f.department}`,
-                  }))}
-                />
-              </div>
-              <div className="ct-field">
-                <span id="ct-date-label">Available date</span>
-                <SelectField
-                  labelId="ct-date-label"
-                  name="date"
-                  value={date}
-                  onChange={(v) => {
-                    setDate(v);
-                    setTime("");
-                  }}
-                  disabled={!facultyId}
-                  placeholder="Choose a date"
-                  options={days.map((d) => ({ value: d, label: niceDate(d) }))}
-                />
-              </div>
-              <div className="ct-field">
-                <span id="ct-time-label">Time</span>
-                <SelectField
-                  labelId="ct-time-label"
-                  name="time"
-                  value={time}
-                  onChange={setTime}
-                  disabled={!date}
-                  placeholder="Choose a time"
-                  options={times}
-                />
-              </div>
-              <label className="ct-field">
-                <span>Consultation topic</span>
-                <input
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g., Capstone project guidance"
-                  maxLength={120}
-                  required
-                />
-              </label>
-              <label className="ct-field ct-field-full">
-                <span>Additional notes (optional)</span>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  maxLength={800}
-                  placeholder="Briefly describe what you would like to discuss."
-                  rows={3}
-                />
-              </label>
-              <button
-                className="ct-btn ct-btn-primary"
-                disabled={busy || !facultyId || !date || !time || !topic.trim()}
-                type="submit"
-              >
-                {busy ? "Submitting…" : "Submit request"}{" "}
-                <Icon name="arrow-right" size={17} />
-              </button>
-            </form>
-          </section>
-        )}
+
         <section className="ct-portal-panel" aria-labelledby="consultations">
           <div className="ct-portal-panel-head">
             <div>
@@ -397,6 +321,7 @@ export default function PortalPage() {
           University identity verification is required before accepting real
           student records.
         </p>
+        {user.role === 'faculty' && <MessageCenter user={user} />}
         <Link to="/" className="ct-portal-back">
           ← Back to ConsultTime homepage
         </Link>
