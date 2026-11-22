@@ -1,0 +1,776 @@
+/* ConsultTime public landing design — seamless, full-width, layered gradients.
+   The background belongs to the full hero rather than to movable rectangles.
+   Color centers move inside the background, avoiding hard clipping seams. */
+.ct-public-landing {
+  position: relative;
+  isolation: isolate;
+  background: #fff;
+  overflow-x: clip;
+}
+/* Delete the old moving viewport-wide pseudo elements. They caused visible
+   vertical edges because translating a rectangle exposed its boundaries. */
+.ct-public-landing::before,
+.ct-public-landing::after {
+  content: none;
+}
+.ct-public-landing > .ct-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  height: 82px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
+}
+.ct-public-landing > .ct-header.scrolled {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(234, 221, 222, 0.7);
+  box-shadow: 0 5px 22px rgba(71, 18, 24, 0.045);
+  backdrop-filter: blur(16px);
+}
+.ct-public-landing .ct-header-inner {
+  width: min(calc(100% - 2 * var(--ct-gutter)), var(--ct-width));
+  margin-inline: auto;
+}
+.ct-public-landing .ct-nav-links > a {
+  font-weight: 700;
+}
+.ct-public-landing > .site-main {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+/* The entire stage always paints from left edge to right edge. Its radial
+   sources shift INSIDE the painted gradient rather than moving a canvas. */
+.ct-landing-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  min-height: max(680px, calc(100svh - 82px));
+  margin: 0;
+  padding: 95px var(--ct-gutter) 130px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+  background:
+    radial-gradient(
+      ellipse 47% 79% at calc(-3% + var(--ct-gradient-left-x, 0px))
+        calc(89% + var(--ct-gradient-left-y, 0px)),
+      rgba(254, 98, 68, 0.54) 0%,
+      rgba(254, 98, 68, 0.29) 31%,
+      rgba(254, 98, 68, 0.1) 58%,
+      transparent 88%
+    ),
+    radial-gradient(
+      ellipse 47% 82% at calc(105% + var(--ct-gradient-right-x, 0px))
+        calc(33% + var(--ct-gradient-right-y, 0px)),
+      rgba(220, 14, 14, 0.42) 0%,
+      rgba(254, 98, 68, 0.3) 37%,
+      rgba(254, 98, 68, 0.1) 65%,
+      transparent 91%
+    ),
+    radial-gradient(
+      ellipse 31% 52% at calc(12% + var(--ct-gradient-top-x, 0px))
+        calc(3% + var(--ct-gradient-top-y, 0px)),
+      rgba(254, 98, 68, 0.2) 0%,
+      rgba(254, 98, 68, 0.08) 54%,
+      transparent 91%
+    ),
+    radial-gradient(
+      ellipse 33% 56% at calc(93% + var(--ct-gradient-bottom-x, 0px))
+        calc(88% + var(--ct-gradient-bottom-y, 0px)),
+      rgba(220, 14, 14, 0.18) 0%,
+      rgba(254, 98, 68, 0.09) 48%,
+      transparent 90%
+    ),
+    linear-gradient(180deg, #fff 0%, #fffcfc 55%, #fff9f7 87%, #fff 100%);
+}
+/* The last 11% gently fades back into the white section below. */
+.ct-landing-stage::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 15%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.34) 46%,
+    #fff 100%
+  );
+}
+
+/* Transparent radial glows: NO solid rectangle, NO hard edge when moved. */
+.ct-landing-glow {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(34px);
+  opacity: 0.64;
+  animation: ct-color-breathe 9.5s ease-in-out infinite alternate;
+}
+.ct-landing-glow-left {
+  width: min(69vw, 1060px);
+  height: min(80vw, 790px);
+  left: -17%;
+  bottom: -45%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(254, 98, 68, 0.4),
+    rgba(254, 98, 68, 0.15) 38%,
+    transparent 71%
+  );
+  translate: var(--ct-gradient-left-x, 0px) var(--ct-gradient-left-y, 0px);
+}
+.ct-landing-glow-right {
+  width: min(67vw, 990px);
+  height: min(79vw, 870px);
+  right: -23%;
+  top: -30%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(220, 14, 14, 0.31),
+    rgba(254, 98, 68, 0.13) 41%,
+    transparent 72%
+  );
+  translate: var(--ct-gradient-right-x, 0px) var(--ct-gradient-right-y, 0px);
+  animation-delay: -3.1s;
+}
+.ct-landing-glow-top {
+  width: min(55vw, 740px);
+  height: 340px;
+  left: -8%;
+  top: -18%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(254, 98, 68, 0.24),
+    rgba(254, 98, 68, 0.1) 42%,
+    transparent 73%
+  );
+  translate: var(--ct-gradient-top-x, 0px) var(--ct-gradient-top-y, 0px);
+  animation-delay: -5.2s;
+}
+.ct-landing-glow-bottom {
+  width: min(55vw, 780px);
+  height: 390px;
+  right: -12%;
+  bottom: -21%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(220, 14, 14, 0.23),
+    rgba(254, 98, 68, 0.1) 42%,
+    transparent 74%
+  );
+  translate: var(--ct-gradient-bottom-x, 0px) var(--ct-gradient-bottom-y, 0px);
+  animation-delay: -6.6s;
+}
+.ct-landing-contour {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  width: 1020px;
+  height: 1020px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.76) 0 1px,
+    transparent 1.5px 17px
+  );
+  -webkit-mask-image: radial-gradient(
+    circle,
+    transparent 3%,
+    #000 25%,
+    #000 65%,
+    transparent 87%
+  );
+  mask-image: radial-gradient(
+    circle,
+    transparent 3%,
+    #000 25%,
+    #000 65%,
+    transparent 87%
+  );
+  opacity: 0.55;
+}
+.ct-landing-contour-left {
+  left: -370px;
+  bottom: -550px;
+  translate: var(--ct-gradient-left-x, 0px) var(--ct-gradient-left-y, 0px);
+}
+.ct-landing-contour-right {
+  width: 1100px;
+  height: 1100px;
+  right: -520px;
+  top: -300px;
+  translate: var(--ct-gradient-right-x, 0px) var(--ct-gradient-right-y, 0px);
+}
+
+/* Headline, buttons and role summary: unchanged content and dimensions. */
+.ct-landing-content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1010px;
+  margin: auto;
+}
+.ct-landing-eyebrow {
+  margin-bottom: 20px;
+  font-size: 11px;
+  font-weight: 850;
+  color: #a51a20;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.ct-landing-content h1 {
+  max-width: 1000px;
+  margin: 0 auto 15px;
+  font-size: clamp(47px, 5.55vw, 82px);
+  line-height: 1.08;
+  letter-spacing: -0.053em;
+  font-weight: 850;
+  color: #242126;
+  text-wrap: balance;
+}
+.ct-landing-accent {
+  display: block;
+  background: linear-gradient(92deg, #dc0e0e 5%, #fe6244 98%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ct-landing-subtitle {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.35vw, 18px);
+  font-weight: 800;
+  color: #393238;
+}
+.ct-landing-description {
+  margin: 17px auto 0;
+  max-width: 620px;
+  font-size: clamp(14px, 1.13vw, 16px);
+  line-height: 1.82;
+  color: #746a71;
+}
+.ct-landing-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 13px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.ct-landing-actions .ct-btn {
+  border-radius: 9px;
+  min-height: 49px;
+  min-width: 162px;
+  box-shadow: 0 7px 20px rgba(171, 21, 28, 0.09);
+}
+.ct-landing-actions .ct-btn-outline {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #d9d1d1;
+  color: #44343a;
+  box-shadow: none;
+}
+.ct-landing-actions .ct-btn-outline:hover {
+  border-color: #dc0e0e;
+  color: #ba1010;
+}
+.ct-landing-trust {
+  position: absolute;
+  z-index: 4;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  width: min(92%, 720px);
+}
+.ct-landing-trust-caption {
+  font-size: 11px;
+  font-weight: 650;
+  color: #948b90;
+  letter-spacing: 0.025em;
+}
+.ct-landing-trust-roles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vw, 65px);
+  flex-wrap: wrap;
+}
+.ct-landing-trust-roles > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 850;
+  color: #71686e;
+  white-space: nowrap;
+  letter-spacing: 0.012em;
+}
+.ct-landing-trust-roles svg {
+  color: #b65456;
+}
+
+/* Intentionally asymmetric floating cards, with varied directions and speeds. */
+.ct-landing-badges {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.ct-landing-float {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: 198px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(238, 213, 213, 0.92);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 33px rgba(104, 38, 38, 0.08);
+  text-align: left;
+  will-change: transform;
+}
+.ct-landing-float-icon {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border-radius: 11px;
+  flex: none;
+  color: #c7151b;
+  background: #fff1f0;
+}
+.ct-landing-float strong {
+  display: block;
+  color: #3a3035;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+.ct-landing-float small {
+  display: block;
+  color: #8a7b80;
+  font-size: 9px;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+.ct-landing-float-top-left {
+  top: 15%;
+  left: 4.9%;
+  animation: ct-badge-float-one 5.5s ease-in-out infinite -1.2s;
+}
+.ct-landing-float-top-right {
+  top: 26%;
+  right: 5.7%;
+  animation: ct-badge-float-two 6.4s ease-in-out infinite -3.3s;
+}
+.ct-landing-float-bottom-left {
+  bottom: 20%;
+  left: 7.2%;
+  animation: ct-badge-float-three 6.1s ease-in-out infinite -2.4s;
+}
+.ct-landing-float-bottom-right {
+  bottom: 31%;
+  right: 4.2%;
+  animation: ct-badge-float-four 5.8s ease-in-out infinite -4.2s;
+}
+/* Each page has its own scattered rhythm without moving cards into text. */
+.ct-landing-about .ct-landing-float-top-left {
+  top: 26%;
+  left: 5.6%;
+}
+.ct-landing-about .ct-landing-float-top-right {
+  top: 12%;
+  right: 6.2%;
+}
+.ct-landing-about .ct-landing-float-bottom-left {
+  bottom: 31%;
+  left: 5.2%;
+}
+.ct-landing-about .ct-landing-float-bottom-right {
+  bottom: 18%;
+  right: 6.7%;
+}
+.ct-landing-features .ct-landing-float-top-left {
+  top: 18%;
+  left: 4.3%;
+}
+.ct-landing-features .ct-landing-float-top-right {
+  top: 31%;
+  right: 5.4%;
+}
+.ct-landing-features .ct-landing-float-bottom-left {
+  bottom: 16%;
+  left: 6.6%;
+}
+.ct-landing-features .ct-landing-float-bottom-right {
+  bottom: 31%;
+  right: 4.8%;
+}
+
+@keyframes ct-badge-float-one {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(9px, -19px, 0) rotate(1.5deg);
+  }
+}
+@keyframes ct-badge-float-two {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0.5deg);
+  }
+  50% {
+    transform: translate3d(-11px, 17px, 0) rotate(-1.7deg);
+  }
+}
+@keyframes ct-badge-float-three {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0.7deg);
+  }
+  50% {
+    transform: translate3d(11px, -15px, 0) rotate(-1.3deg);
+  }
+}
+@keyframes ct-badge-float-four {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translate3d(-8px, 20px, 0) rotate(1.3deg);
+  }
+}
+@keyframes ct-color-breathe {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.78;
+  }
+}
+@keyframes ct-badge-float-mobile {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(2px, -5px, 0);
+  }
+}
+
+/* Keep the editorial sections underneath exactly as they were. */
+.ct-public-landing .ct-section-heading {
+  margin-inline: auto;
+  text-align: center;
+  max-width: 830px;
+}
+.ct-public-landing .ct-feature-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+}
+.ct-public-landing .ct-feature-showcase-left {
+  text-align: center;
+  max-width: 780px;
+}
+.ct-public-landing .ct-capability-stack {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.ct-public-landing .ct-capability-row {
+  min-width: 0;
+  align-items: flex-start;
+}
+.ct-public-landing .ct-two-col {
+  gap: 44px;
+  align-items: center;
+}
+.ct-public-landing .ct-value-band {
+  background: #fff;
+}
+
+@media (max-width: 1250px) {
+  .ct-landing-stage {
+    min-height: 650px;
+    padding-top: 96px;
+  }
+  .ct-landing-content {
+    max-width: 750px;
+  }
+  .ct-landing-content h1 {
+    font-size: clamp(45px, 5.25vw, 70px);
+  }
+  .ct-landing-float {
+    max-width: 155px;
+    padding: 10px;
+  }
+  .ct-landing-float-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  /* Cards become a readable grid on narrow screens. Smaller staggered motion
+     avoids cards colliding with one another as they float. */
+  .ct-landing-float {
+    animation-name: ct-badge-float-mobile;
+  }
+  .ct-landing-float strong {
+    font-size: 10px;
+  }
+  .ct-landing-float small {
+    font-size: 9px;
+  }
+  .ct-landing-float-top-left {
+    left: 2.8%;
+  }
+  .ct-landing-float-top-right {
+    right: 3%;
+  }
+  .ct-landing-float-bottom-left {
+    left: 3.2%;
+  }
+  .ct-landing-float-bottom-right {
+    right: 2.9%;
+  }
+}
+@media (max-width: 960px) {
+  .ct-landing-content h1 {
+    max-width: 710px;
+  }
+  .ct-public-landing .ct-capability-stack {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 641px) and (max-width: 1120px) {
+  .ct-landing-stage {
+    min-height: auto;
+    padding: 92px var(--ct-gutter) 45px;
+  }
+  .ct-landing-badges {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 48px;
+  }
+  .ct-landing-float,
+  .ct-landing-float-top-left,
+  .ct-landing-float-top-right,
+  .ct-landing-float-bottom-left,
+  .ct-landing-float-bottom-right {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+  .ct-landing-trust {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin-top: 38px;
+  }
+}
+@media (max-width: 850px) {
+  .ct-public-landing > .ct-header {
+    height: 72px;
+  }
+  .ct-public-landing .ct-header-navigation {
+    left: 0;
+    right: 0;
+    top: 71px;
+  }
+  .ct-landing-stage {
+    min-height: max(640px, calc(100svh - 72px));
+    padding: 96px var(--ct-gutter) 122px;
+  }
+  .ct-landing-content {
+    max-width: 620px;
+  }
+  .ct-landing-content h1 {
+    font-size: clamp(42px, 6.6vw, 61px);
+  }
+  .ct-landing-trust {
+    bottom: 34px;
+  }
+}
+@media (max-width: 640px) {
+  .ct-landing-stage {
+    min-height: calc(100svh - 72px);
+    padding: 96px var(--ct-gutter) 32px;
+  }
+  .ct-landing-content h1 {
+    font-size: clamp(36px, 8.8vw, 50px);
+    letter-spacing: -0.047em;
+  }
+  .ct-landing-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    margin-bottom: 14px;
+  }
+  .ct-landing-subtitle {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .ct-landing-description {
+    font-size: 13px;
+    line-height: 1.75;
+    margin-top: 12px;
+  }
+  .ct-landing-actions {
+    gap: 9px;
+    margin-top: 22px;
+  }
+  .ct-landing-actions .ct-btn {
+    font-size: 12px;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 14px;
+  }
+  .ct-landing-badges {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 35px;
+  }
+  .ct-landing-float,
+  .ct-landing-float-top-left,
+  .ct-landing-float-top-right,
+  .ct-landing-float-bottom-left,
+  .ct-landing-float-bottom-right {
+    position: relative;
+    inset: auto;
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+  }
+
+  /* Cards become a readable grid on narrow screens. Smaller staggered motion
+     avoids cards colliding with one another as they float. */
+  .ct-landing-float {
+    animation-name: ct-badge-float-mobile;
+  }
+  .ct-landing-float strong {
+    font-size: 10px;
+  }
+  .ct-landing-float small {
+    display: block;
+    font-size: 9px;
+  }
+  .ct-landing-trust {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin: 35px 0 0;
+    gap: 12px;
+  }
+  .ct-landing-trust-caption {
+    font-size: 10px;
+  }
+  .ct-landing-trust-roles {
+    gap: 14px 22px;
+  }
+  .ct-landing-trust-roles > span {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .ct-landing-glow {
+    filter: blur(22px);
+  }
+  .ct-landing-glow-left {
+    left: -49%;
+    bottom: -11%;
+    width: 116vw;
+    height: 105vw;
+  }
+  .ct-landing-glow-right {
+    right: -55%;
+    top: 0;
+    width: 120vw;
+    height: 133vw;
+  }
+  .ct-landing-glow-top {
+    left: -22%;
+    top: -3%;
+    width: 110vw;
+  }
+  .ct-landing-glow-bottom {
+    right: -45%;
+    bottom: 0;
+    width: 115vw;
+  }
+  .ct-landing-contour-left {
+    left: -615px;
+    bottom: -520px;
+  }
+  .ct-landing-contour-right {
+    right: -700px;
+    top: -290px;
+  }
+  .ct-landing-stage::after {
+    height: 8%;
+  }
+}
+@media (max-width: 390px) {
+  .ct-landing-stage {
+    padding-inline: 14px;
+  }
+  .ct-landing-content h1 {
+    font-size: clamp(32px, 9vw, 39px);
+  }
+  .ct-landing-float {
+    padding: 8px;
+    gap: 6px;
+  }
+  .ct-landing-float-icon {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-landing-float,
+  .ct-landing-glow {
+    animation: none;
+    will-change: auto;
+  }
+  .ct-landing-float {
+    transform: none;
+  }
+}

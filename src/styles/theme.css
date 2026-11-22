@@ -1,0 +1,15 @@
+:root {
+  /* Approved ConsultTime brand gradient: red -> coral. Never use dark maroon as a stop. */
+  --ct-red: #dc0e0e;
+  --ct-coral: #fe6244;
+  --ct-red-deep: #dc0e0e;
+  --ct-red-dark: #dc0e0e;
+  --ct-gradient: linear-gradient(120deg, #dc0e0e 0%, #fe6244 100%);
+  --ct-gradient-dark: linear-gradient(125deg, #dc0e0e 0%, #fe6244 100%);
+  --ct-text: #222126;
+  --ct-muted: #6c6970;
+  --ct-line: #efe5e5;
+  --ct-rose: #fff5f5;
+  --ct-width: 1600px;
+  --ct-gutter: clamp(18px, 3vw, 42px);
+}
